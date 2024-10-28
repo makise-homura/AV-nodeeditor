@@ -7,6 +7,7 @@
 
 #include "ConnectionState.hpp"
 #include "Definitions.hpp"
+#include "qobjectdefs.h"
 
 class QGraphicsSceneMouseEvent;
 
@@ -58,6 +59,9 @@ public:
 
     ConnectionState &connectionState();
 
+Q_SIGNALS:
+    void doubleClicked(); // Сигнал двойного клика
+
 protected:
     void paint(QPainter *painter,
                QStyleOptionGraphicsItem const *option,
@@ -72,6 +76,12 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
 
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+
+    // Переопределение метода для двойного клика
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) override {
+        Q_EMIT doubleClicked(); // Генерируем сигнал
+        QGraphicsObject::mouseDoubleClickEvent(event); // Вызываем базовую реализацию
+    }
 
 private:
     void initializePosition();

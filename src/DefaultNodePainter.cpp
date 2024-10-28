@@ -203,14 +203,22 @@ void DefaultNodePainter::drawNodeCaption(QPainter *painter, NodeGraphicsObject &
 
     QFont f = painter->font();
     f.setBold(true);
+    f.setPointSize(20);
 
     QPointF position = geometry.captionPosition(nodeId);
 
     QJsonDocument json = QJsonDocument::fromVariant(model.nodeData(nodeId, NodeRole::Style));
     NodeStyle nodeStyle(json.object());
 
+    // Вычисляем ширину текста
+    QFontMetrics fontMetrics(f);
+    int textWidth = fontMetrics.width(name);
+
+    position.setX(position.x() - textWidth / 2);
+
     painter->setFont(f);
     painter->setPen(nodeStyle.FontColor);
+    position.setY(position.y() -25);
     painter->drawText(position, name);
 
     f.setBold(false);

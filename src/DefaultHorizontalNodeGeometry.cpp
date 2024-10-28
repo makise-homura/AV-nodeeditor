@@ -109,15 +109,13 @@ QPointF DefaultHorizontalNodeGeometry::portTextPosition(NodeId const nodeId,
 
     p.setY(p.y() + rect.height() / 4.0);
 
-    QSize size = _graphModel.nodeData<QSize>(nodeId, NodeRole::Size);
-
     switch (portType) {
     case PortType::In:
         p.setX(_portSpasing);
         break;
 
     case PortType::Out:
-        p.setX(size.width() - _portSpasing - rect.width());
+        p.setX(_portSpasing);
         break;
 
     default:

@@ -17,6 +17,14 @@
 
 #include "QUuidStdHash.hpp"
 
+#include "fcpdrc/cesgrouprecord.h"
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QLabel>
+#include <QListWidget>
+#include <QTableWidgetItem>
+
 class QUndoStack;
 
 namespace QtNodes {
@@ -57,6 +65,10 @@ public:
     void setConnectionPainter(std::unique_ptr<AbstractConnectionPainter> newPainter);
 
     QUndoStack &undoStack();
+
+    void getRecordTemplates(std::vector<FcpDRC::cesgrouprecord> inputRecordVector);
+
+    void removeDialog(ConnectionId const connectionId);
 
 public:
     /// Creates a "draft" instance of ConnectionGraphicsObject.
@@ -146,6 +158,8 @@ public Q_SLOTS:
     /// Slot called when the `connectionId` is created in the AbstractGraphModel.
     void onConnectionCreated(ConnectionId const connectionId);
 
+    void openDialog(ConnectionId const connectionId);
+
     void onNodeDeleted(NodeId const nodeId);
 
     void onNodeCreated(NodeId const nodeId);
@@ -182,6 +196,12 @@ private:
     QUndoStack *_undoStack;
 
     Qt::Orientation _orientation;
+
+    std::vector<FcpDRC::cesgrouprecord> m_record;
+
+    QDialog *dialogTestForError = nullptr;
+
+    std::unordered_map<ConnectionId, std::unique_ptr<QDialog>> _dialogs;
 };
 
 } // namespace QtNodes

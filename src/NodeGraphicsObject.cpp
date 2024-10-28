@@ -31,7 +31,7 @@ NodeGraphicsObject::NodeGraphicsObject(BasicGraphicsScene &scene, NodeId nodeId)
 
     setLockedState();
 
-    setCacheMode(QGraphicsItem::DeviceCoordinateCache);
+    //setCacheMode(QGraphicsItem::DeviceCoordinateCache); при приближении сцены, элементы обрезаются
 
     QJsonObject nodeStyleJson = _graphModel.nodeData(_nodeId, NodeRole::Style).toJsonObject();
 
@@ -78,10 +78,7 @@ BasicGraphicsScene *NodeGraphicsObject::nodeScene() const
 
 void NodeGraphicsObject::updateQWidgetEmbedPos()
 {
-  if (_proxyWidget) {
-    AbstractNodeGeometry &geometry = nodeScene()->nodeGeometry();
-    _proxyWidget->setPos(geometry.widgetPosition(_nodeId));
-  }
+    _proxyWidget->setPos(nodeScene()->nodeGeometry().widgetPosition(_nodeId));
 }
 
 void NodeGraphicsObject::embedQWidget()
@@ -213,7 +210,7 @@ void NodeGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
                                                      PortRole::ConnectionPolicyRole)
                                            .value<ConnectionPolicy>();
 
-                if (!connected.empty() && outPolicy == ConnectionPolicy::One) {
+                if (!connected.empty() && outPolicy == ConnectionPolicy::Many) {
                     for (auto &cnId : connected) {
                         _graphModel.deleteConnection(cnId);
                     }

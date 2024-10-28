@@ -198,6 +198,10 @@ void ConnectionGraphicsObject::paint(QPainter *painter,
 
     painter->setClipRect(option->exposedRect);
 
+    QPen pen;
+    pen.setColor(StyleCollection::connectionStyle().normalColor());
+    painter->setPen(pen);
+
     nodeScene()->connectionPainter().paint(painter, *this);
 }
 

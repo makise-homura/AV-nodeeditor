@@ -133,6 +133,14 @@ std::unique_ptr<ConnectionGraphicsObject> const &BasicGraphicsScene::makeDraftCo
     return _draftConnection;
 }
 
+void BasicGraphicsScene::getRecordTemplates(std::vector<FcpDRC::cesgrouprecord> inputRecordVector)
+{
+    for (const auto &headerRecord : inputRecordVector)
+    {
+        m_record.push_back(headerRecord);
+    }
+}
+
 void BasicGraphicsScene::resetDraftConnection()
 {
     _draftConnection.reset();
@@ -228,6 +236,16 @@ void BasicGraphicsScene::updateAttachedNodes(ConnectionId const connectionId,
     }
 }
 
+void BasicGraphicsScene::removeDialog(ConnectionId const connectionId) {
+    auto it = _dialogs.find(connectionId);
+    if (it != _dialogs.end()) {
+        // Закрываем диалог, если он открыт
+        it->second->close();
+        // Удаляем диалог из контейнера
+        _dialogs.erase(it);
+    }
+}
+
 void BasicGraphicsScene::onConnectionDeleted(ConnectionId const connectionId)
 {
     auto it = _connectionGraphicsObjects.find(connectionId);
@@ -243,16 +261,65 @@ void BasicGraphicsScene::onConnectionDeleted(ConnectionId const connectionId)
     updateAttachedNodes(connectionId, PortType::Out);
     updateAttachedNodes(connectionId, PortType::In);
 
+    // Удаляем диалоговое окно, если оно существует
+    removeDialog(connectionId);
+
     Q_EMIT modified(this);
 }
 
 void BasicGraphicsScene::onConnectionCreated(ConnectionId const connectionId)
 {
-    _connectionGraphicsObjects[connectionId]
-        = std::make_unique<ConnectionGraphicsObject>(*this, connectionId);
+    // Создаем объект соединения
+    auto connectionObject = std::make_unique<ConnectionGraphicsObject>(*this, connectionId);
+
+    // Устанавливаем обработчик двойного клика
+    connect(connectionObject.get(), &ConnectionGraphicsObject::doubleClicked, this, [this, connectionId]() {
+        openDialog(connectionId);
+    });
+
+    _connectionGraphicsObjects[connectionId] = std::move(connectionObject);
 
     updateAttachedNodes(connectionId, PortType::Out);
     updateAttachedNodes(connectionId, PortType::In);
+}
+
+void BasicGraphicsScene::openDialog(ConnectionId const connectionId)
+{
+    if (_dialogs.find(connectionId) == _dialogs.end())
+    {
+        // Если диалог не существует, создаем его
+        auto dialog = std::make_unique<QDialog>();
+        dialog->setWindowTitle("Select template");
+        dialog->setModal(true);
+
+        QVBoxLayout *layout = new QVBoxLayout(dialog.get());
+        QLabel *label = new QLabel("Select template:");
+        layout->addWidget(label);
+
+        QListWidget *listWidget = new QListWidget();
+        layout->addWidget(listWidget);
+
+        QStringList headers;
+        for (const auto &headerRecord : m_record)
+        {
+            headers = headerRecord.getColumnHeaders();
+            for (int i = 0; i < headers.size(); ++i)
+            {
+                listWidget->addItem(headers[i]);
+            }
+        }
+
+        QPushButton *okButton = new QPushButton("OK");
+        layout->addWidget(okButton);
+
+        // Подключаем сигнал кнопки OK к слоту закрытия диалога
+        connect(okButton, &QPushButton::clicked, dialog.get(), &QDialog::accept);
+
+        // Сохраняем диалог в контейнер
+        _dialogs[connectionId] = std::move(dialog);
+    }
+    // Показываем диалоговое окно для данного соединения
+    _dialogs[connectionId]->show();
 
     Q_EMIT modified(this);
 }

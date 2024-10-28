@@ -27,7 +27,7 @@ bool NodeConnectionInteraction::canConnect(PortIndex *portIndex) const
 
     PortType requiredPort = _cgo.connectionState().requiredPort();
 
-    if (requiredPort == PortType::None) {
+    if (requiredPort == PortType::None || requiredPort == PortType::Out) {
         return false;
     }
 
