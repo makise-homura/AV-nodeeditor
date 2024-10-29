@@ -323,6 +323,46 @@ void BasicGraphicsScene::openDialog(ConnectionId const connectionId)
 
     Q_EMIT modified(this);
 }
+/*
+// Получение индекса входного порта для соединения
+int BasicGraphicsScene::getInputPortIndexForConnection(ConnectionId const connectionId)
+{
+    // Получаем NodeId, связанный с данным соединением
+    NodeId nodeId = getNodeId(PortType::In, connectionId);
+
+    // Получаем количество входных портов для данного узла
+    auto nInPorts = _graphModel.nodeData<PortCount>(nodeId, NodeRole::InPortCount);
+
+    // Перебираем входные порты, чтобы найти соответствующее соединение
+    for (PortIndex index = 0; index < nInPorts; ++index) {
+        auto const &inConnectionIds = _graphModel.connections(nodeId, PortType::In, index);
+        if (std::find(inConnectionIds.begin(), inConnectionIds.end(), connectionId) != inConnectionIds.end()) {
+            return index; // Возвращаем индекс входного порта
+        }
+    }
+
+    return -1; // Если не найдено, возвращаем -1
+}
+
+// Получение индекса выходного порта для соединения
+int BasicGraphicsScene::getOutputPortIndexForConnection(ConnectionId const connectionId)
+{
+    // Получаем NodeId, связанный с данным соединением
+    NodeId nodeId = getNodeId(PortType::Out, connectionId);
+
+    // Получаем количество выходных портов для данного узла
+    auto nOutPorts = _graphModel.nodeData<PortCount>(nodeId, NodeRole::OutPortCount);
+
+    // Перебираем выходные порты, чтобы найти соответствующее соединение
+    for (PortIndex index = 0; index < nOutPorts; ++index) {
+        auto const &outConnectionIds = _graphModel.connections(nodeId, PortType::Out, index);
+        if (std::find(outConnectionIds.begin(), outConnectionIds.end(), connectionId) != outConnectionIds.end()) {
+            return index; // Возвращаем индекс выходного порта
+        }
+    }
+
+    return -1; // Если не найдено, возвращаем -1
+}*/
 
 void BasicGraphicsScene::onNodeDeleted(NodeId const nodeId)
 {

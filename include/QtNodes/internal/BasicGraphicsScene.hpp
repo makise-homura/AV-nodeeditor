@@ -199,9 +199,11 @@ private:
 
     std::vector<FcpDRC::cesgrouprecord> m_record;
 
-    QDialog *dialogTestForError = nullptr;
-
     std::unordered_map<ConnectionId, std::unique_ptr<QDialog>> _dialogs;
+
+    //int getInputPortIndexForConnection(ConnectionId const connectionId);
+
+    //int getOutputPortIndexForConnection(ConnectionId const connectionId);
 };
 
 } // namespace QtNodes
