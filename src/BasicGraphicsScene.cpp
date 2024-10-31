@@ -9,6 +9,7 @@
 #include "DefaultVerticalNodeGeometry.hpp"
 #include "GraphicsView.hpp"
 #include "NodeGraphicsObject.hpp"
+#include "qdebug.h"
 
 #include <QUndoStack>
 
@@ -177,6 +178,32 @@ ConnectionGraphicsObject *BasicGraphicsScene::connectionGraphicsObject(Connectio
     return cgo;
 }
 
+std::vector<BasicGraphicsScene::ConnectionInfo> BasicGraphicsScene::getConnections() const {
+    std::vector<ConnectionInfo> connections;
+
+    for (auto const &pair : _connectionGraphicsObjects) {
+        ConnectionId connectionId = pair.first;
+        //ConnectionGraphicsObject *connectionObject = pair.second.get();
+
+        NodeId nodeIdIn = getNodeId(PortType::In, connectionId);
+        NodeId nodeIdOut = getNodeId(PortType::Out, connectionId);
+        PortIndex getPortTypeIn = getPortIndex(PortType::In, connectionId);
+        PortIndex getPortTypeOut = getPortIndex(PortType::Out, connectionId);
+
+        ConnectionInfo connectionInfo;
+        connectionInfo.connectionId = connectionId;
+        connectionInfo.nodeIdIn = nodeIdIn;
+        connectionInfo.nodeIdOut = nodeIdOut;
+        connectionInfo.portTypeIn = static_cast<PortType>(getPortTypeIn);
+        connectionInfo.portTypeOut = static_cast<PortType>(getPortTypeOut);
+
+        connections.push_back(connectionInfo);
+    }
+
+    return connections;
+}
+
+
 void BasicGraphicsScene::setOrientation(Qt::Orientation const orientation)
 {
     if (_orientation != orientation) {
@@ -240,7 +267,8 @@ void BasicGraphicsScene::removeDialog(ConnectionId const connectionId) {
     auto it = _dialogs.find(connectionId);
     if (it != _dialogs.end()) {
         // Закрываем диалог, если он открыт
-        it->second->close();
+        it->second.first->close();
+        //it->second->close();
         // Удаляем диалог из контейнера
         _dialogs.erase(it);
     }
@@ -316,53 +344,16 @@ void BasicGraphicsScene::openDialog(ConnectionId const connectionId)
         connect(okButton, &QPushButton::clicked, dialog.get(), &QDialog::accept);
 
         // Сохраняем диалог в контейнер
-        _dialogs[connectionId] = std::move(dialog);
+        _dialogs[connectionId] = std::make_pair(std::move(dialog), listWidget);
+        //_dialogs[connectionId] = std::move(dialog);
+        //addDialog(connectionId, std::move(dialog), listWidget);
     }
     // Показываем диалоговое окно для данного соединения
-    _dialogs[connectionId]->show();
+    _dialogs[connectionId].first->show();
+    //_dialogs[connectionId]->show();
 
     Q_EMIT modified(this);
 }
-/*
-// Получение индекса входного порта для соединения
-int BasicGraphicsScene::getInputPortIndexForConnection(ConnectionId const connectionId)
-{
-    // Получаем NodeId, связанный с данным соединением
-    NodeId nodeId = getNodeId(PortType::In, connectionId);
-
-    // Получаем количество входных портов для данного узла
-    auto nInPorts = _graphModel.nodeData<PortCount>(nodeId, NodeRole::InPortCount);
-
-    // Перебираем входные порты, чтобы найти соответствующее соединение
-    for (PortIndex index = 0; index < nInPorts; ++index) {
-        auto const &inConnectionIds = _graphModel.connections(nodeId, PortType::In, index);
-        if (std::find(inConnectionIds.begin(), inConnectionIds.end(), connectionId) != inConnectionIds.end()) {
-            return index; // Возвращаем индекс входного порта
-        }
-    }
-
-    return -1; // Если не найдено, возвращаем -1
-}
-
-// Получение индекса выходного порта для соединения
-int BasicGraphicsScene::getOutputPortIndexForConnection(ConnectionId const connectionId)
-{
-    // Получаем NodeId, связанный с данным соединением
-    NodeId nodeId = getNodeId(PortType::Out, connectionId);
-
-    // Получаем количество выходных портов для данного узла
-    auto nOutPorts = _graphModel.nodeData<PortCount>(nodeId, NodeRole::OutPortCount);
-
-    // Перебираем выходные порты, чтобы найти соответствующее соединение
-    for (PortIndex index = 0; index < nOutPorts; ++index) {
-        auto const &outConnectionIds = _graphModel.connections(nodeId, PortType::Out, index);
-        if (std::find(outConnectionIds.begin(), outConnectionIds.end(), connectionId) != outConnectionIds.end()) {
-            return index; // Возвращаем индекс выходного порта
-        }
-    }
-
-    return -1; // Если не найдено, возвращаем -1
-}*/
 
 void BasicGraphicsScene::onNodeDeleted(NodeId const nodeId)
 {

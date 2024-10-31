@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Export.hpp"
+#include "qdebug.h"
 
 #include <QtCore/QMetaObject>
 
@@ -102,6 +103,22 @@ struct ConnectionId
     PortIndex outPortIndex;
     NodeId inNodeId;
     PortIndex inPortIndex;
+
+    bool operator<(const ConnectionId& other) const {
+            // Сравниваем по каждому элементу по порядку
+            if (outNodeId != other.outNodeId) return outNodeId < other.outNodeId;
+            if (outPortIndex != other.outPortIndex) return outPortIndex < other.outPortIndex;
+            if (inNodeId != other.inNodeId) return inNodeId < other.inNodeId;
+            return inPortIndex < other.inPortIndex;
+        }
+    // Перегрузка оператора вывода для QDebug
+        friend QDebug operator<<(QDebug debug, const ConnectionId& id) {
+            debug.nospace() << "ConnectionId(outNodeId: " << id.outNodeId
+                            << ", outPortIndex: " << id.outPortIndex
+                            << ", inNodeId: " << id.inNodeId
+                            << ", inPortIndex: " << id.inPortIndex << ")";
+            return debug;
+        }
 };
 
 inline bool operator==(ConnectionId const &a, ConnectionId const &b)
