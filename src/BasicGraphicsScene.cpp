@@ -181,21 +181,14 @@ ConnectionGraphicsObject *BasicGraphicsScene::connectionGraphicsObject(Connectio
 std::vector<BasicGraphicsScene::ConnectionInfo> BasicGraphicsScene::getConnections() const {
     std::vector<ConnectionInfo> connections;
 
-    for (auto const &pair : _connectionGraphicsObjects) {
-        ConnectionId connectionId = pair.first;
-        //ConnectionGraphicsObject *connectionObject = pair.second.get();
-
-        NodeId nodeIdIn = getNodeId(PortType::In, connectionId);
-        NodeId nodeIdOut = getNodeId(PortType::Out, connectionId);
-        PortIndex getPortTypeIn = getPortIndex(PortType::In, connectionId);
-        PortIndex getPortTypeOut = getPortIndex(PortType::Out, connectionId);
-
+    for (const auto& [connectionId, dialogPair] : _dialogs) {
         ConnectionInfo connectionInfo;
         connectionInfo.connectionId = connectionId;
-        connectionInfo.nodeIdIn = nodeIdIn;
-        connectionInfo.nodeIdOut = nodeIdOut;
-        connectionInfo.portTypeIn = static_cast<PortType>(getPortTypeIn);
-        connectionInfo.portTypeOut = static_cast<PortType>(getPortTypeOut);
+        connectionInfo.nodeIdOut = connectionId.outNodeId;
+        connectionInfo.nodeIdIn = connectionId.inNodeId;
+        connectionInfo.portTypeIn = PortType::In;
+        connectionInfo.portTypeOut = PortType::Out;
+        connectionInfo.templateName = dialogPair.second; // Store the saved template name
 
         connections.push_back(connectionInfo);
     }
@@ -340,17 +333,24 @@ void BasicGraphicsScene::openDialog(ConnectionId const connectionId)
         QPushButton *okButton = new QPushButton("OK");
         layout->addWidget(okButton);
 
-        // Подключаем сигнал кнопки OK к слоту закрытия диалога
-        connect(okButton, &QPushButton::clicked, dialog.get(), &QDialog::accept);
-
+        // Подключаем сигнал кнопки OK к слоту, который будет обрабатывать выбор
+        connect(okButton, &QPushButton::clicked, [this, connectionId, dialog = dialog.get(), listWidget]()
+        {
+            // Получаем выбранный элемент из listWidget
+            QListWidgetItem *selectedItem = listWidget->currentItem();
+            if (selectedItem) {
+                QString selectedTemplate = selectedItem->text();
+                // Сохраняем выбранный шаблон в _dialogs
+                _dialogs[connectionId].second = selectedTemplate;
+                //qDebug() << "Selected template for connection" << connectionId << ":" << selectedTemplate;
+            }
+            dialog->accept(); // Закрываем диалог
+        });
         // Сохраняем диалог в контейнер
-        _dialogs[connectionId] = std::make_pair(std::move(dialog), listWidget);
-        //_dialogs[connectionId] = std::move(dialog);
-        //addDialog(connectionId, std::move(dialog), listWidget);
+        _dialogs[connectionId] = std::make_pair(std::move(dialog), QString());
     }
     // Показываем диалоговое окно для данного соединения
     _dialogs[connectionId].first->show();
-    //_dialogs[connectionId]->show();
 
     Q_EMIT modified(this);
 }

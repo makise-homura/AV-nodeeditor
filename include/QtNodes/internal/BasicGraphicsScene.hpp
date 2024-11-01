@@ -78,9 +78,33 @@ public:
         NodeId nodeIdOut;
         PortType portTypeIn;
         PortType portTypeOut;
+        QString templateName;
     };
 
     std::vector<ConnectionInfo> getConnections() const;
+
+    const std::map<ConnectionId, std::pair<std::unique_ptr<QDialog>, QString>>& getDialogs() const {
+            return _dialogs;
+        }
+
+    /*QString getListWidgetByConnectionInfo(NodeId nodeIdOut, NodeId nodeIdIn) {
+        //qDebug() << "Looking for listWidget for nodes:" << nodeIdOut << "and" << nodeIdIn;
+
+        for (const auto& [connectionId, dialogPair] : _dialogs) {
+            std::ignore = connectionId;
+
+            const auto& connectionInfo = getConnections();
+            for (const auto& connection : connectionInfo) {
+                if (connection.nodeIdOut == nodeIdOut && connection.nodeIdIn == nodeIdIn) {
+                    //qDebug() << "Found listWidget for nodes:" << nodeIdOut << "and" << nodeIdIn << "with template:" << dialogPair.second->count();
+                    return dialogPair.second; // Возвращаем указатель на QListWidget
+                }
+            }
+        }
+
+        //qDebug() << "No listWidget found for nodes:" << nodeIdOut << "and" << nodeIdIn;
+        return nullptr; // Если не найдено, возвращаем nullptr
+    }*/
 
     // Метод для получения указателя на QListWidget по ConnectionId
     /*QListWidget* getListWidget(const ConnectionId& connectionId) {
@@ -99,24 +123,6 @@ public:
     //    qDebug() << "Adding dialog for connectionId:" << connectionId;
     //    _dialogs[connectionId] = std::make_pair(std::move(dialog), listWidget);
     //}
-    QListWidget* getListWidgetByConnectionInfo(NodeId nodeIdOut, NodeId nodeIdIn) {
-        qDebug() << "Looking for listWidget for nodes:" << nodeIdOut << "and" << nodeIdIn;
-
-        for (const auto& [connectionId, dialogPair] : _dialogs) {
-            std::ignore = connectionId;
-
-            const auto& connectionInfo = getConnections();
-            for (const auto& connection : connectionInfo) {
-                if (connection.nodeIdOut == nodeIdOut && connection.nodeIdIn == nodeIdIn) {
-                    qDebug() << "Found listWidget for nodes:" << nodeIdOut << "and" << nodeIdIn << "with template:" << dialogPair.second->count();
-                    return dialogPair.second; // Возвращаем указатель на QListWidget
-                }
-            }
-        }
-
-        qDebug() << "No listWidget found for nodes:" << nodeIdOut << "and" << nodeIdIn;
-        return nullptr; // Если не найдено, возвращаем nullptr
-    }
 
 public:
     /// Creates a "draft" instance of ConnectionGraphicsObject.
@@ -247,7 +253,7 @@ private:
 
     std::vector<FcpDRC::cesgrouprecord> m_record;
 
-    std::map<ConnectionId, std::pair<std::unique_ptr<QDialog>, QListWidget*>> _dialogs;
+    std::map<ConnectionId, std::pair<std::unique_ptr<QDialog>, QString>> _dialogs;
     //std::map<ConnectionId, std::unique_ptr<QDialog>> _dialogs;
 };
 
