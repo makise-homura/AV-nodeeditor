@@ -207,12 +207,24 @@ void ConnectionGraphicsObject::paint(QPainter *painter,
 
 void ConnectionGraphicsObject::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    // Проверка, является ли порт входным
+    if (_connectionState.requiredPort() == PortType::Out) {
+        event->ignore(); // Игнорировать событие, если порт входной
+        return;
+    }
+
     QGraphicsItem::mousePressEvent(event);
 }
 
 void ConnectionGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     prepareGeometryChange();
+
+    // Проверка, является ли порт входным
+        if (_connectionState.requiredPort() == PortType::Out) {
+            event->ignore(); // Игнорировать событие, если порт входной
+            return;
+        }
 
     auto view = static_cast<QGraphicsView *>(event->widget());
     auto ngo = locateNodeAt(event->scenePos(), *nodeScene(), view->transform());
@@ -241,6 +253,11 @@ void ConnectionGraphicsObject::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void ConnectionGraphicsObject::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    // Проверка, является ли порт входным
+    //if (_connectionState.requiredPort() == PortType::In) {
+    //    event->ignore(); // Игнорировать событие, если порт входной
+    //    return;
+    //}
     QGraphicsItem::mouseReleaseEvent(event);
 
     ungrabMouse();

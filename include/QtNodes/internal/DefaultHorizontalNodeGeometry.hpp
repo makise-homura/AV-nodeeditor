@@ -26,6 +26,7 @@ public:
     QPointF portTextPosition(NodeId const nodeId,
                              PortType const portType,
                              PortIndex const PortIndex) const override;
+
     QPointF captionPosition(NodeId const nodeId) const override;
 
     QRectF captionRect(NodeId const nodeId) const override;

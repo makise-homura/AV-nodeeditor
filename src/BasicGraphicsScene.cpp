@@ -267,11 +267,50 @@ void BasicGraphicsScene::removeDialog(ConnectionId const connectionId) {
     }
 }
 
+void BasicGraphicsScene::addTextUnderConnection(ConnectionId connectionId, const QString& templateText) {
+    // Получаем соединение по его идентификатору
+    auto connection = _connectionGraphicsObjects.find(connectionId);
+    if (connection != _connectionGraphicsObjects.end()) {
+        // Получаем объект соединения
+        ConnectionGraphicsObject* connectionObject = connection->second.get();
+
+        // Получаем конечные точки соединения
+        //QPointF outPoint = connectionObject->out();
+        QPointF inPoint = connectionObject->in();
+
+        // Рассчитываем среднюю точку для размещения текста
+        QPointF textPosition = inPoint;
+        textPosition.setX(textPosition.x() - 50);
+        textPosition.setY(textPosition.y() + 1); // Сдвигаем немного вниз
+
+        // Создаем текстовый элемент
+        QGraphicsTextItem* textItem = new QGraphicsTextItem(templateText);
+        textItem->setPos(textPosition);
+        textItem->setDefaultTextColor(Qt::white); // Устанавливаем цвет текста
+        textItem->setFont(QFont("Arial", 10)); // Установливаем шрифт и размер
+
+        // Добавляем текстовый элемент на сцену
+        this->addItem(textItem);
+
+        // Сохраняем текстовый элемент в структуре
+        _textItems[connectionId] = textItem; // Сохраняем текст под соединением
+    }
+}
+
 void BasicGraphicsScene::onConnectionDeleted(ConnectionId const connectionId)
 {
     auto it = _connectionGraphicsObjects.find(connectionId);
     if (it != _connectionGraphicsObjects.end()) {
         _connectionGraphicsObjects.erase(it);
+    }
+
+    // Удаляем текстовый элемент, если он существует
+    auto textIt = _textItems.find(connectionId);
+    if (textIt != _textItems.end()) {
+        QGraphicsTextItem* textItem = textIt.value();
+        this->removeItem(textItem); // Удаляем текстовый элемент из сцены
+        delete textItem; // Освобождаем память
+        _textItems.erase(textIt); // Удаляем из структуры
     }
 
     // TODO: do we need it?
@@ -343,6 +382,7 @@ void BasicGraphicsScene::openDialog(ConnectionId const connectionId)
                 // Сохраняем выбранный шаблон в _dialogs
                 _dialogs[connectionId].second = selectedTemplate;
                 //qDebug() << "Selected template for connection" << connectionId << ":" << selectedTemplate;
+                addTextUnderConnection(connectionId, selectedTemplate);
             }
             dialog->accept(); // Закрываем диалог
         });

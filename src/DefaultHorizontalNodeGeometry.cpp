@@ -115,7 +115,12 @@ QPointF DefaultHorizontalNodeGeometry::portTextPosition(NodeId const nodeId,
         break;
 
     case PortType::Out:
-        p.setX(_portSpasing);
+        // Изменяем позицию текста для выходного порта узла с ID 0
+        if (nodeId == 0) {
+            p.setX(p.x() - 150);
+        } else {
+            p.setX(_portSpasing);
+        }
         break;
 
     default:

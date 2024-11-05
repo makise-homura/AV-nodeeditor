@@ -323,7 +323,7 @@ void GraphicsView::keyReleaseEvent(QKeyEvent *event)
 void GraphicsView::mousePressEvent(QMouseEvent *event)
 {
     QGraphicsView::mousePressEvent(event);
-    if (event->button() == Qt::LeftButton) {
+    if (event->button() == Qt::RightButton) {
         _clickPos = mapToScene(event->pos());
     }
 }
@@ -331,7 +331,7 @@ void GraphicsView::mousePressEvent(QMouseEvent *event)
 void GraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
-    if (scene()->mouseGrabberItem() == nullptr && event->buttons() == Qt::LeftButton) {
+    if (scene()->mouseGrabberItem() == nullptr && event->buttons() == Qt::RightButton) {
         // Make sure shift is not being pressed
         if ((event->modifiers() & Qt::ShiftModifier) == 0) {
             QPointF difference = _clickPos - mapToScene(event->pos());
