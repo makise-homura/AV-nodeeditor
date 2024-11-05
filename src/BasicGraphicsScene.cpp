@@ -296,7 +296,7 @@ void BasicGraphicsScene::addTextUnderConnection(ConnectionId connectionId, const
         _textItems[connectionId] = textItem; // Сохраняем текст под соединением
 
         // Подключаем сигнал перемещения соединения к обновлению текста
-        QPointer<QGraphicsTextItem> textItemPtr(textItem); // Используем QPointer
+        QPointer<QGraphicsTextItem> textItemPtr(textItem);
         connect(connectionObject, &ConnectionGraphicsObject::positionChanged, this, [textItemPtr, connectionObject]() {
             if (textItemPtr) { // Проверяем, существует ли текстовый элемент
                 QPointF inPoint = connectionObject->in();
