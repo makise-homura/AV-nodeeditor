@@ -3,6 +3,7 @@
 #include <QtGui/QIcon>
 
 #include "AbstractGraphModel.hpp"
+#include "BasicGraphicsScene.hpp"
 #include "ConnectionGraphicsObject.hpp"
 #include "ConnectionState.hpp"
 #include "Definitions.hpp"
@@ -161,12 +162,16 @@ void DefaultConnectionPainter::drawNormalLine(QPainter *painter, ConnectionGraph
                                     - QPoint(pixmap.width() / 2, pixmap.height() / 2),
                                 pixmap);
         }
-    } else {
+    }
+    else
+    {
         p.setColor(normalColorOut);
-
+        QColor connectionColor = cgo.getConnectionColor();
         if (selected) {
-            p.setColor(selectedColor);
-        }
+                p.setColor(selectedColor);
+            } else {
+                p.setColor(connectionColor.isValid() ? connectionColor : normalColorOut);
+            }
 
         painter->setPen(p);
         painter->setBrush(Qt::NoBrush);

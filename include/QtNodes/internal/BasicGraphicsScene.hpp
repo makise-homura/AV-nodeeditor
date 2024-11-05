@@ -89,6 +89,21 @@ public:
             return _dialogs;
         }
 
+    QColor getColorForHeader(const QString &header) const {
+        for (const auto &headerRecord : m_record) {
+            QStringList headers = headerRecord.getColumnHeaders();
+            QList<QColor> colors = headerRecord.getColumnColors();
+            for (int i = 0; i < headers.size(); ++i) {
+                if (headers[i] == header) {
+                    return colors[i]; // Возвращаем цвет, связанный с заголовком
+                }
+            }
+        }
+        return QColor(); // Возвращаем пустой цвет, если не найден
+    }
+
+    QColor connectionColor;
+
 public:
     /// Creates a "draft" instance of ConnectionGraphicsObject.
     /**
@@ -221,7 +236,6 @@ private:
     std::vector<FcpDRC::cesgrouprecord> m_record;
 
     std::map<ConnectionId, std::pair<std::unique_ptr<QDialog>, QString>> _dialogs;
-    //std::map<ConnectionId, std::unique_ptr<QDialog>> _dialogs;
 };
 
 } // namespace QtNodes

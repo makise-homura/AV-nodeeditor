@@ -177,6 +177,8 @@ void ConnectionGraphicsObject::move()
     prepareGeometryChange();
 
     update();
+
+    Q_EMIT positionChanged();
 }
 
 ConnectionState const &ConnectionGraphicsObject::connectionState() const

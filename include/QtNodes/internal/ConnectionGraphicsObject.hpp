@@ -59,8 +59,14 @@ public:
 
     ConnectionState &connectionState();
 
+    // Метод для установки цвета соединения
+        void setConnectionColor(const QColor& color) { connectionColor = color; }
+        QColor getConnectionColor() const { return connectionColor; }
+
 Q_SIGNALS:
     void doubleClicked(); // Сигнал двойного клика
+
+    void positionChanged();
 
 protected:
     void paint(QPainter *painter,
@@ -101,6 +107,8 @@ private:
 
     mutable QPointF _out;
     mutable QPointF _in;
+
+    QColor connectionColor;
 };
 
 } // namespace QtNodes

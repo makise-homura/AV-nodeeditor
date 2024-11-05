@@ -294,6 +294,18 @@ void BasicGraphicsScene::addTextUnderConnection(ConnectionId connectionId, const
 
         // Сохраняем текстовый элемент в структуре
         _textItems[connectionId] = textItem; // Сохраняем текст под соединением
+
+        // Подключаем сигнал перемещения соединения к обновлению текста
+        QPointer<QGraphicsTextItem> textItemPtr(textItem); // Используем QPointer
+        connect(connectionObject, &ConnectionGraphicsObject::positionChanged, this, [textItemPtr, connectionObject]() {
+            if (textItemPtr) { // Проверяем, существует ли текстовый элемент
+                QPointF inPoint = connectionObject->in();
+                QPointF textPosition = inPoint;
+                textPosition.setX(textPosition.x() - 50);
+                textPosition.setY(textPosition.y() + 1); // Сдвигаем немного вниз
+                textItemPtr->setPos(textPosition);
+            }
+        });
     }
 }
 
@@ -382,6 +394,21 @@ void BasicGraphicsScene::openDialog(ConnectionId const connectionId)
                 // Сохраняем выбранный шаблон в _dialogs
                 _dialogs[connectionId].second = selectedTemplate;
                 //qDebug() << "Selected template for connection" << connectionId << ":" << selectedTemplate;
+
+                // Получаем цвет для выбранного заголовка
+                QColor selectedColor = getColorForHeader(selectedTemplate);
+
+                // Устанавливаем цвет соединения
+                if (auto connectionObject = connectionGraphicsObject(connectionId)) {
+                    connectionObject->setConnectionColor(selectedColor); // Устанавливаем цвет
+                    connectionObject->update(); // Обновляем отображение
+                }
+
+                // Обновляем соединение, чтобы использовать новый цвет
+                if (auto connectionObject = connectionGraphicsObject(connectionId)) {
+                    connectionObject->update(); // Предполагается, что метод update() обновляет отображение
+                }
+
                 addTextUnderConnection(connectionId, selectedTemplate);
             }
             dialog->accept(); // Закрываем диалог
