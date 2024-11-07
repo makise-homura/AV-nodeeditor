@@ -406,7 +406,7 @@ void BasicGraphicsScene::openDialog(ConnectionId const connectionId)
 
                 // Обновляем соединение, чтобы использовать новый цвет
                 if (auto connectionObject = connectionGraphicsObject(connectionId)) {
-                    connectionObject->update(); // Предполагается, что метод update() обновляет отображение
+                    connectionObject->update();
                 }
 
                 addTextUnderConnection(connectionId, selectedTemplate);
