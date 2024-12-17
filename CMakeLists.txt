@@ -8,6 +8,8 @@ project(QtNodesLibrary CXX)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
+set(CMAKE_CXX_STANDARD 17) # Needed for recent changes in BasicGraphicsScene.cpp
+
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 set(CMAKE_DISABLE_SOURCE_CHANGES  ON)
 set(OpenGL_GL_PREFERENCE LEGACY)
@@ -138,25 +140,22 @@ set(HPP_HEADER_FILES
 
 # If we want to give the option to build a static library,
 # set BUILD_SHARED_LIBS option to OFF
-add_library(QtNodes SHARED
+add_library(QtNodes
   ${CPP_SOURCE_FILES}
   ${HPP_HEADER_FILES}
   ${RESOURCES}
-  ../common/fcpdrc/cesgrouprecord.cpp
 )
 
 add_library(QtNodes::QtNodes ALIAS QtNodes)
+
 
 target_include_directories(QtNodes
   PUBLIC
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../common>
-
   PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/QtNodes/internal>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../common>
 )
 
 target_link_libraries(QtNodes
@@ -169,7 +168,7 @@ target_link_libraries(QtNodes
 
 target_compile_definitions(QtNodes
   PUBLIC
-    NODE_EDITOR_SHARED
+    $<IF:$<BOOL:${BUILD_SHARED_LIBS}>, NODE_EDITOR_SHARED, NODE_EDITOR_STATIC>
   PRIVATE
     NODE_EDITOR_EXPORTS
     #NODE_DEBUG_DRAWING
@@ -201,7 +200,7 @@ set_target_properties(QtNodes
   PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
     LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
 ######
