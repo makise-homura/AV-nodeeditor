@@ -93,6 +93,7 @@ set(CPP_SOURCE_FILES
   src/StyleCollection.cpp
   src/UndoCommands.cpp
   src/locateNode.cpp
+  src/fcpdrc/cesgrouprecord.cpp
 )
 
 set(HPP_HEADER_FILES
@@ -132,6 +133,7 @@ set(HPP_HEADER_FILES
   include/QtNodes/internal/DefaultVerticalNodeGeometry.hpp
   include/QtNodes/internal/NodeConnectionInteraction.hpp
   include/QtNodes/internal/UndoCommands.hpp
+  include/QtNodes/internal/fcpdrc/cesgrouprecord.hpp
 )
 
 # If we want to give the option to build a static library,

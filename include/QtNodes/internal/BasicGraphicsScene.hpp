@@ -17,7 +17,7 @@
 
 #include "QUuidStdHash.hpp"
 
-#include "fcpdrc/cesgrouprecord.h"
+#include "fcpdrc/cesgrouprecord.hpp"
 #include "qdebug.h"
 #include <QDialog>
 #include <QVBoxLayout>
