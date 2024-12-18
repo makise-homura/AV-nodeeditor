@@ -3,11 +3,12 @@
 #include "QString"
 #include "QStringList"
 #include "qcolor.h"
+#include <QtNodes/internal/Export.hpp>
 
 namespace FcpDRC
 {
 
-class cesgrouprecord
+class NODE_EDITOR_PUBLIC cesgrouprecord
 {
       public:
         cesgrouprecord();
